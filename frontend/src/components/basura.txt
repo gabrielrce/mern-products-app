@@ -1,0 +1,89 @@
+  state = {
+    name: "",
+    price: "",
+    editing: false,
+    _id: "",
+  };
+
+  async componentDidMount() {
+    if (this.props.match.params.id) {
+      console.log(this.props.match.params.id);
+      const res = await axios.get(
+        "http://localhost:4000/api/products/" + this.props.match.params.id
+      );
+      console.log(res.data);
+      this.setState({
+        name: res.data.name,
+        price: res.data.price,
+        _id: res.data._id,
+        editing: true,
+      });
+    }
+  }
+
+  onSubmit = async (e) => {
+    e.preventDefault();
+    if (this.state.editing) {
+      const updatedProduct = {
+        name: this.state.name,
+        price: this.state.price,
+      };
+      await axios.put(
+        "http://localhost:4000/api/products/" + this.state._id,
+        updatedProduct
+      );
+    } else {
+      const newProduct = {
+        name: this.state.name,
+        price: this.state.price,
+      };
+      axios.post("http://localhost:4000/api/products", newProduct);
+    }
+    window.location.href = "/";
+  };
+
+  onInputChange = (e) => {
+    this.setState({
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  render() {
+    return (
+      <div className="col-md-6 offset-md-3">
+        <div className="card card-body">
+          <h4>Create a Product</h4>
+          <form onSubmit={this.onSubmit}>
+            {/* Prod Title */}
+            <div className="form-group">
+              <input
+                type="text"
+                className="form-control"
+                placeholder="Name"
+                onChange={this.onInputChange}
+                name="name"
+                value={this.state.name}
+                required
+              />
+            </div>
+            {/* Prod price */}
+            <div className="form-group">
+              <textarea
+                type="text"
+                className="form-control"
+                placeholder="Product"
+                name="product"
+                onChange={this.onInputChange}
+                value={this.state.price}
+                required
+              ></textarea>
+            </div>
+
+            <button className="btn btn-primary">
+              Save <i className="material-icons">assignment</i>
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
